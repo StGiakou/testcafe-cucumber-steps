@@ -3,10 +3,20 @@
 
 // #############################################################################
 
-const { Given, When, Then } = require('cucumber');
-const { ClientFunction, Selector } = require('testcafe');
+const {
+    Given,
+    When,
+    Then
+} = require('cucumber');
+const {
+    ClientFunction,
+    Selector
+} = require('testcafe');
 const path = require('path');
-const { readDirectories, createRequest } = require('js-automation-tools');
+const {
+    readDirectories,
+    createRequest
+} = require('js-automation-tools');
 const SelectorXPath = require('./utils/selector-xpath.js');
 const errors = require('./utils/errors.js');
 
@@ -15,8 +25,7 @@ const spacesToIndent = 4;
 const isCalledExternally = __dirname.includes('node_modules');
 
 const pageObjectsFolderPathes = 'PO_FOLDER_PATH' in process.env ?
-    process.env.PO_FOLDER_PATH.replace(/\s+/g, '').split(',') :
-    [path.join('tests', 'page-model')];
+    process.env.PO_FOLDER_PATH.replace(/\s+/g, '').split(',') : [path.join('tests', 'page-model')];
 
 const fullPageObjectsFolderPathes = isCalledExternally ?
     pageObjectsFolderPathes.map((pageObjectsFolderPath) => {
@@ -33,15 +42,15 @@ let pageObjects = {};
  * Requires Page Object files
  * @returns {Array} allRequiredPageObjects
  */
-async function requirePageObjects () {
+async function requirePageObjects() {
     const allPageObjectFiles = await readDirectories(
         fullPageObjectsFolderPathes);
     const allRequiredPageObjects = allPageObjectFiles.filter(
         (value) => {
-            return value.includes('.js');
+            return value.includes('.ts');
         }
     ).map((file) => {
-        const fileName = path.basename(file, '.js');
+        const fileName = path.basename(file, '.ts');
 
         pageObjects[fileName] = require(file);
 
@@ -63,7 +72,7 @@ requirePageObjects();
  * @param {String} locator
  * @returns {Boolean}
  */
-function isXPath (locator) {
+function isXPath(locator) {
     const firstCharOfLocator = 0;
     const fourthCharOfLocator = 3;
 
@@ -76,7 +85,7 @@ function isXPath (locator) {
  * @param {String} elem
  * @returns {Object} element
  */
-function getElement (page, elem) {
+function getElement(page, elem) {
     const locator = pageObjects[page][elem];
     let element;
 
@@ -97,7 +106,7 @@ function getElement (page, elem) {
  * Sets cookie on the current website
  * @param {String} cookie
  */
-function setCookie (cookie) {
+function setCookie(cookie) {
     const domain = window.location.hostname.split('.').filter((part) => {
         return part !== 'www';
     }).join('.');
@@ -192,8 +201,7 @@ Given('I/user send(s) {string} request to {string}.{string} with body {string}.{
 
 Given(
     'I/user send(s) {string} request to {word} from {word}( page) with body {word} from {word}( page)',
-    async function (t, [method, element1, page1, element2, page2]
-    ) {
+    async function (t, [method, element1, page1, element2, page2]) {
         await createRequest(method, pageObjects[page1][element1], '', pageObjects[page2][element2]);
     }
 );
@@ -227,8 +235,7 @@ Given(
     // eslint-disable-next-line cucumber/expression-type
     'I/user send(s) {string} request to {word} from {word}( page) with ' +
     'headers {word} from {word}( page) and body {word} from {word}( page)',
-    async function (t, [method, element1, page1, element2, page2, element3, page3]
-    ) {
+    async function (t, [method, element1, page1, element2, page2, element3, page3]) {
         await createRequest(
             method,
             pageObjects[page1][element1],
@@ -404,11 +411,13 @@ When('I/user wait(s) up to {int} ms for {string}.{string} to appear', async func
 ) {
     const elem = getElement(page, element);
 
-    await t.expect(Selector(elem).with(
-        { timeout: timeToWait, visibilityCheck: true }
-    ).exists).ok(
-        `${errors.ELEMENT_NOT_PRESENT} "${page}"."${element}" up to ${timeToWait} ms`,
-        { timeout: timeToWait }
+    await t.expect(Selector(elem).with({
+        timeout: timeToWait,
+        visibilityCheck: true
+    }).exists).ok(
+        `${errors.ELEMENT_NOT_PRESENT} "${page}"."${element}" up to ${timeToWait} ms`, {
+            timeout: timeToWait
+        }
     );
 });
 
@@ -417,11 +426,13 @@ When('I/user wait(s) up to {int} ms for {word} from {word}( page) to appear', as
 ) {
     const elem = getElement(page, element);
 
-    await t.expect(Selector(elem).with(
-        { timeout: timeToWait, visibilityCheck: true }
-    ).exists).ok(
-        `${errors.ELEMENT_NOT_PRESENT} "${page}"."${element}" up to ${timeToWait} ms`,
-        { timeout: timeToWait }
+    await t.expect(Selector(elem).with({
+        timeout: timeToWait,
+        visibilityCheck: true
+    }).exists).ok(
+        `${errors.ELEMENT_NOT_PRESENT} "${page}"."${element}" up to ${timeToWait} ms`, {
+            timeout: timeToWait
+        }
     );
 });
 
@@ -513,7 +524,9 @@ When('I/user clear(s) {string}.{string} and type(s) {string}', async function (
 ) {
     const elem = getElement(page, element);
 
-    await t.typeText(elem, text, { replace: true });
+    await t.typeText(elem, text, {
+        replace: true
+    });
 });
 
 When(
@@ -521,7 +534,9 @@ When(
     async function (t, [element, page, text]) {
         const elem = getElement(page, element);
 
-        await t.typeText(elem, text, { replace: true });
+        await t.typeText(elem, text, {
+            replace: true
+        });
     }
 );
 
@@ -532,8 +547,9 @@ When(
 
         await t.typeText(
             elem,
-            pageObjects[page2][element2],
-            { replace: true }
+            pageObjects[page2][element2], {
+                replace: true
+            }
         );
     }
 );
@@ -545,8 +561,9 @@ When(
 
         await t.typeText(
             elem,
-            pageObjects[page2][element2],
-            { replace: true }
+            pageObjects[page2][element2], {
+                replace: true
+            }
         );
     }
 );
